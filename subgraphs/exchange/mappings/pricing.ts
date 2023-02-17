@@ -2,15 +2,22 @@
 import { BigDecimal, Address } from "@graphprotocol/graph-ts/index";
 import { Pair, Token, Bundle } from "../generated/schema";
 import { ZERO_BD, factoryContract, ADDRESS_ZERO, ONE_BD } from "./utils";
+import { log } from '@graphprotocol/graph-ts'
 
 let WBNB_ADDRESS = "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c";
-let BUSD_WBNB_PAIR = "0x58f876857a02d6762e0101bb5c46a8c1ed44dc16"; // created block 589414
-let USDT_WBNB_PAIR = "0x16b9a82891338f9ba80e2d6970fdda79d1eb0dae"; // created block 648115
+let WKD_ADDRESS = "0x5344c20fd242545f31723689662ac12b9556fc3d";
+// let BUSD_WBNB_PAIR = "0x58f876857a02d6762e0101bb5c46a8c1ed44dc16"; // created block 589414
+let BUSD_WBNB_PAIR = "0xa610fa3c8f2418150a2b77da216a0ff29b0fd43e"; // created block 24008996
+// let USDT_WBNB_PAIR = "0x16b9a82891338f9ba80e2d6970fdda79d1eb0dae"; // created block 648115
+let USDT_WBNB_PAIR = "0xffd12e182e61d27a12efeaab222640461ca025cc";
 
 export function getBnbPriceInUSD(): BigDecimal {
   // fetch eth prices for each stablecoin
   let usdtPair = Pair.load(USDT_WBNB_PAIR); // usdt is token0
   let busdPair = Pair.load(BUSD_WBNB_PAIR); // busd is token1
+
+  let debug = busdPair === null ? "null" : busdPair.token1Price.toString()
+  log.debug('BUSDPAIR is {}', [debug])
 
   if (busdPair !== null && usdtPair !== null) {
     let totalLiquidityBNB = busdPair.reserve0.plus(usdtPair.reserve1);
@@ -32,6 +39,7 @@ export function getBnbPriceInUSD(): BigDecimal {
 
 // token where amounts should contribute to tracked volume and liquidity
 let WHITELIST: string[] = [
+  WKD_ADDRESS,
   "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c", // WBNB
   "0xe9e7cea3dedca5984780bafc599bd69add087d56", // BUSD
   "0x55d398326f99059ff775485246999027b3197955", // USDT
@@ -68,6 +76,7 @@ export function findBnbPerToken(token: Token): BigDecimal {
     }
   }
   return ZERO_BD; // nothing was found return 0
+  // return ONE_BD; // nothing was found return 0
 }
 
 /**

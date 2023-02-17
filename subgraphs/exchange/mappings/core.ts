@@ -15,6 +15,8 @@ import { updatePairDayData, updateTokenDayData, updatePancakeDayData, updatePair
 import { getBnbPriceInUSD, findBnbPerToken, getTrackedVolumeUSD, getTrackedLiquidityUSD } from "./pricing";
 import { convertTokenToDecimal, ADDRESS_ZERO, FACTORY_ADDRESS, ONE_BI, ZERO_BD, BI_18 } from "./utils";
 
+import { log } from '@graphprotocol/graph-ts'
+
 function isCompleteMint(mintId: string): boolean {
   return MintEvent.load(mintId).sender !== null; // sufficient checks
 }
@@ -184,7 +186,11 @@ export function handleSync(event: Sync): void {
 
   let bundle = Bundle.load("1");
   bundle.bnbPrice = getBnbPriceInUSD();
+
   bundle.save();
+
+  let debug = bundle === null ? "null" : bundle.bnbPrice.toString()
+  log.debug("BNBPrice in USD is {}", [debug])
 
   let t0DerivedBNB = findBnbPerToken(token0 as Token);
   token0.derivedBNB = t0DerivedBNB;
